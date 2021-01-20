@@ -1,0 +1,1142 @@
+#include <stdio.h>
+#include <windows.h>
+#include <string.h>
+#include <stdlib.h>
+#include <conio.h>
+
+//prototypes of all functions
+void mainmenu();
+int GetInfo();
+void Addbooks();
+void searchbooks();
+void Returnfunc();
+int checkid(int t);
+void viewbooks();
+void Displayprologue();
+int getcredentials();
+int checkcredentials(char A[]);
+void Credentials();
+void deletebooks();
+void editbooks();
+void resetcredentials();
+
+//list of global files(that can be accessed from any part of code)
+FILE *fp, *fu, *fc;
+
+//list of global variables
+int s, Q = 0;
+int findbook = 0;
+char Username[100],Password[100];
+
+struct books
+{
+	int id;
+	char stname[50];
+	char name[50];
+	char Author[50];
+	char prologue[1000];
+	int quantity;
+	float Price;
+	int count;
+	int rackno;
+
+};
+struct books a;
+
+struct usercredentials
+{
+	char username[100];
+	char password[100];	
+};
+struct usercredentials user;
+
+void Headmessage()
+{
+	int i;
+
+	printf("\n\n");
+	Sleep(10);
+	printf("\t\t\t###########################################################################");
+
+    Sleep(10);
+    printf("\n\t\t\t############                                                   ############");
+    Sleep(10);
+    printf("\n\t\t\t############                                                   ############");
+    Sleep(30);
+    printf("\n\t\t\t############      Library management System Project in C       ############");
+    Sleep(10);
+	printf("\n\t\t\t############                                                   ############");
+	Sleep(10);
+	Sleep(10);
+    printf("\n\t\t\t############                                                   ############");
+
+    Sleep(10);
+	printf("\n\t\t\t###########################################################################\n\n");
+	
+	for( i = 0; i < 120; i++ )
+    {
+    	Sleep(1);
+    	printf("-");
+	}
+	printf("\n");
+
+    return ;
+}
+
+
+int main()
+{
+	system("cls");
+    system("color E0");
+	int i;
+
+	Headmessage();
+    
+	printf("\n\n");
+    printf("\n\t\t\t  ------------------------------------------------------------");
+    printf("\n\t\t\t  |      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=       |  ");
+    Sleep(30);
+	printf("\n\t\t\t  |      =                 WELCOME                   =       |  ");
+    Sleep(35);
+	printf("\n\t\t\t  |      =                   TO                      =       |  ");
+    Sleep(30);
+	printf("\n\t\t\t  |      =                 LIBRARY                   =       |  ");
+    Sleep(30);
+	printf("\n\t\t\t  |      =               MANAGEMENT                  =       |  ");
+    Sleep(30);
+	printf("\n\t\t\t  |      =                 SYSTEM                    =       |  ");
+    Sleep(30);
+	printf("\n\t\t\t  |      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=       |  ");
+    Sleep(30);
+	printf("\n\t\t\t  ------------------------------------------------------------\n");
+    Sleep(10);
+	printf("\n\n\n\t Press any key to continue.....");
+    
+	getchar();
+    Credentials();
+}
+
+//definition of mainmenu
+void mainmenu()
+{
+	
+	int i ;	
+
+	printf("\t\t\t<--------------------->MAIN MENU<----------------------->\n");
+    for( i = 0; i < 120; i++ )
+    {
+    	printf("-");
+	}
+	Sleep(30);
+	printf("\n\n\n\t\t\ta) Add Books");
+	Sleep(30);
+	printf("\n\n\n\t\t\tb) Search Books");
+	Sleep(30);
+	printf("\n\n\n\t\t\tc) Display Books");
+	Sleep(30);
+	printf("\n\n\n\t\t\td) Delete Books");
+	Sleep(30);
+	printf("\n\n\n\t\t\te) Edit Books");
+	Sleep(30);
+	printf("\n\n\n\t\t\tf) Reset Credentials");
+    Sleep(30);
+	printf("\n\n\n\t\t\tq) Sign out\n\n");
+	for( i = 0; i < 120; i++ )
+    {
+    	Sleep(5);
+    	printf("-");
+	}
+	printf("\nEnter your choice: ");
+	switch(getch())
+	{
+		case 'a':
+		{
+			Addbooks();
+			break;
+		}
+		
+		
+		case 'b':
+		{
+		   searchbooks();
+		   break;
+		}	
+		
+		case 'c':
+		{
+		    viewbooks();	
+		    break;
+		}	
+		
+		case 'd':
+		{
+			deletebooks();
+			break;
+		}
+		
+		case 'e':
+		{
+			editbooks();
+			break;
+		}
+			
+		case 'f':
+		{
+			resetcredentials();
+			break;
+		}	
+		
+		case 'q':
+		{
+			system("cls");
+			Credentials();
+		}	
+		
+		default:
+		{	
+		    printf("\n\n\t\t\t");
+			printf("\aWrong Entry!!Please re-enter correct option");
+
+			if( getch() );
+			{
+				system("cls");
+
+			 	Headmessage();
+			 	mainmenu();
+		    }	
+        }
+	}
+}
+
+//Addbook
+void Addbooks()
+{
+	system("cls");
+	Headmessage();
+
+	int i;	
+	
+	printf("\t\t\t<--------------------->Add Books<----------------------->\n");
+    
+	for( i = 0; i < 120; i++ )
+    {
+    	printf("-");
+	}
+	
+	fp = fopen("Addbooks.txt","ab+");
+    
+	if( GetInfo()==1 )
+    {
+    	fseek(fp, 0, SEEK_END);
+        fwrite(&a, sizeof(a), 1, fp);
+        fclose(fp);
+
+        printf("\n\n\t\t\t\a<-----Record is successfully saved----->");
+        printf("\n\nSave any more (Y/N)?");
+
+        if( getch() == 'n' )
+        {
+			system("cls");
+
+			Headmessage();
+			mainmenu();
+        }
+        else
+        {
+			system("cls");
+        	Addbooks();
+		}
+	}
+}
+
+//definition of GetInfo
+int GetInfo()
+{
+   int t;
+
+   printf("\n\t\tEnter the information below: ");
+   printf("\n\n\t\t1) Book id: ");
+   scanf("%d", &t);
+   
+   if(checkid(t)==0)
+   {
+   	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\a\aThe Book ID already exists!");
+   	getch();
+   	Addbooks();
+   	return 0;
+   }
+   a.id = t;
+   printf("\n\t\t2) Book Name: ");
+   fflush(stdin);
+   gets(a.name);
+   printf("\n\t\t3) Author Name: ");
+   fflush(stdin);
+   gets(a.Author);
+   printf("\n\t\t4) Quantity: ");
+   fflush(stdin);
+   scanf("%d",&a.quantity);
+   printf("\n\t\t5) Price: ");
+   scanf("%f",&a.Price);
+   printf("\n\t\t6) Rack Number: ");
+   scanf("%d",&a.rackno);
+   printf("\n\t\t7) Prologue: ");
+   fflush(stdin);
+   gets(a.prologue);
+   return 1;
+
+
+}
+//Searchbook 
+void searchbooks()
+{
+	system("cls");
+	int d;
+	Headmessage();
+	int i ;	
+	 printf("\t\t\t<--------------------->Search Books<----------------------->\n");
+      for(i=0;i<120;i++)
+    {
+    	printf("-");
+	}
+	printf("\n\n\t\ta) Search by ID");
+	printf("\n\n\t\tb) Search by Name");
+	printf("\n\n\t\tEnter your choice: ");
+	fp = fopen("Addbooks.txt","rb+");
+	rewind(fp);
+	
+	switch(getch())
+	{
+		case 'a':
+		{
+			system("cls");
+			Headmessage();
+			int i ;	
+	        printf("\t\t\t<--------------------->Search Books by ID<----------------------->\n");
+            for(i=0;i<120;i++)
+            {
+    	      printf("-");
+          	}
+          	
+          	printf("\n\n\t\tEnter the book id : ");
+          	scanf("%d",&d);
+          	printf("\n\nSearching");
+          	for(i=0;i<30;i++)
+          	{
+          		Sleep(28);
+          		printf(".");
+			}
+			while(fread(&a,sizeof(a),1,fp)==1)
+			{
+				if(a.id==d)
+				{
+					 printf("\n\n\t\tThe Book is available");
+					printf("\n\n\t<-------------------------------------------------------->\n");
+					printf("\t\t 1) ID: %d \n",a.id);
+					printf("\t\t 2) Name: %s \n",a.name);
+					printf("\t\t 3) Author: %s  \n",a.Author);
+					printf("\t\t 4) Quantity: %d \n",a.quantity);
+					printf("\t\t 5) Price: %.2f PKR  \n",a.Price);
+					printf("\t\t 6) Rack No. : %d\n",a.rackno);
+prologueid:					
+					printf("\n\t Do you want to see the prologue of this book (Y/N)?");
+					
+					switch(getch())
+					{
+						case 'y':
+							{
+								printf("\n\n\t\t 7) Prologue: %s\n", a.prologue);
+								break;
+							}
+							
+						case 'n':
+						{
+							break;	
+						}
+						
+						default:
+						{
+							printf("\n\t\t\aINVALID INPUT!");
+							printf("\n\t\t\aPress any key to continue: ");
+							getch();
+							goto prologueid;
+							break;
+						}	
+					}
+				printf("\n\t<---------------------------------------------------------->\n");
+					findbook = -999;			
+				}
+			}
+			if(findbook!=-999)
+			{
+				printf("\n\t------------------------------------\n");
+				printf("\t\a|     NO RECORD FOUND !            |\n");
+				printf("\t------------------------------------\n");
+			}
+			printf("\n\t\tTry another search (Y/N)?");
+			if(getch()=='y')
+			{
+				findbook=0;
+				searchbooks();
+			}
+			else
+			{
+				findbook=0;
+				system("cls");
+				Headmessage();
+				mainmenu();
+				break;
+			}
+          	
+			
+		}
+		
+		case 'b':
+		{
+				
+			char s[30];
+			system("cls");
+			Headmessage();
+	        printf("\t\t\t<--------------------->Search Books by Name<----------------------->\n");
+            for(i=0;i<120;i++)
+            {
+    	      printf("-");
+          	}
+          	printf("\n\n\t\tEnter the Book Name: ");
+          	fflush(stdin);
+          	gets(s);
+          	fflush(stdin);
+          	int d=0;
+          	printf("\n\nSearching");
+          	for(i=0;i<30;i++)
+          	{
+          		Sleep(28);
+          		printf(".");
+			}
+          	while(fread(&a,sizeof(a),1,fp)==1)
+          	{
+          		 if(strcmp(a.name,(s))==0)
+          		{
+          		   printf("\n\n\t\tThe Book is available");
+					printf("\n\n\t<-------------------------------------------------------->\n");
+					printf("\t\t 1) ID: %d \n",a.id);
+					printf("\t\t 2) Name: %s \n",a.name);
+					printf("\t\t 3) Author: %s  \n",a.Author);
+					printf("\t\t 4) Quantity: %d \n",a.quantity);
+					printf("\t\t 5) Price: %.2f PKR  \n",a.Price);
+					printf("\t\t 6) Rack No. : %d\n",a.rackno);
+prologuename:					
+					printf("\n\t Do you want to see the prologue of this book (Y/N)?");
+					
+					switch(getch())
+					{
+						case 'y':
+							{
+								printf("\n\n\t\t 7) Prologue: %s\n", a.prologue);
+								break;
+							}
+							
+						case 'n':
+						{
+							break;	
+						}
+						
+						default:
+						{
+							printf("\n\t\t\aINVALID INPUT!");
+							printf("\n\t\t\aPress any key to continue: ");
+							getch();
+							goto prologuename;
+							break;
+						}	
+					}
+			
+					printf("\n\t<---------------------------------------------------------->\n");
+					d++;	
+				} 
+			}
+			if(d==0)
+			{
+				printf("\n\t------------------------------------\n");
+				printf("\t\a|     NO RECORD FOUND !            |\n");
+				printf("\t------------------------------------\n");
+			}
+			printf("\n\t\tTry another search (Y/N)?");
+			if(getch()=='y')
+			{
+				searchbooks();
+			}
+			else
+			{
+				system("cls");
+				Headmessage();
+				mainmenu();
+				break;
+			}
+			
+        }
+        default:
+        	{
+        		printf("\n\n\n\n\n\t\tINVALID COMMAND! (press any key to continue.....)");
+        		getch();
+        		searchbooks();
+			}
+	}
+	fclose(fp);
+}
+//viewbooks
+void viewbooks()
+{
+	int i=0,j,x=0;
+	system("cls");
+	Headmessage();
+		
+	printf("\t\t\t<--------------------->Display Books<----------------------->\n");
+    
+	Sleep(30);  
+	for(j=0;j<120;j++)
+    {
+    	printf("-");
+	}
+	fp=fopen("Addbooks.txt","rb");
+	while(fread(&a,sizeof(a),1,fp)==1)
+	{
+		Sleep(50);
+			printf("\n\t<-------------------------------------------------------->\n");
+			printf("\tBook Count:- %d\n\n",x+1);
+			printf("\t\t 1) ID: %d \n",a.id);
+			printf("\t\t 2) Name: %s \n",a.name);
+			printf("\t\t 3) Author: %s  \n",a.Author);
+			printf("\t\t 4) Quantity: %d \n",a.quantity);
+			printf("\t\t 5) Price: %.2f PKR  \n",a.Price);
+			printf("\t\t 6) Rack No. : %d\n",a.rackno);
+			printf("\t<---------------------------------------------------------->\n");
+			for(j=0;j<60;j++)
+			{
+				printf("*-");
+			}
+			i=i + a.quantity;
+			x+=1;
+			
+	}
+	printf("\n\t\t\tTOTAL QUANTITY : %d",i);
+	fclose(fp);
+	printf("\n\t");
+	Returnfunc();
+	
+	
+	
+}
+//deletebooks
+void deletebooks()
+{
+	char temporary[100]={"copydelete.txt"};
+	char permanent[100]={"Addbooks.txt"};
+	char Del;
+
+	system("cls");
+	Headmessage();
+	
+	int i ;	
+	printf("\t\t\t<--------------------->DELETE BOOKS<----------------------->\n");
+    
+	for( i = 0; i < 120; i++ )
+    {
+    	printf("-");
+	}
+	
+	int ID;
+
+	printf("\n\n\t\tEnter the BOOK-ID that you want to delete:  ");
+	scanf("%d", &ID);
+	
+	fp = fopen(permanent,"r");
+
+
+	rewind(fp);
+
+	
+	while(fread(&a,sizeof(a),1,fp)==1)
+	{
+		if(ID==a.id)
+		{
+			printf("\n\n\t\tThe book is available!");
+			printf("\n\n\t\t Book name: %s", a.name);
+			printf("\n\t\t Book author: %s", a.Author);
+			Del = 't';
+			
+		}
+    }
+		if(Del != 't')
+		{
+			printf("\n\n\t\t\aError! No such record found... Press any key to try again");
+			getch();
+			deletebooks();
+		}
+		
+		if(Del=='t')
+		{
+Labelforinvaliddelete:			
+			printf("\n\n\n\t\tDo you want to delete this book (Y/N)?");
+			switch( getch() )
+			{
+				case 'y':
+				{
+					fc = fopen(temporary,"w");
+					rewind(fp);
+					while(fread(&a,sizeof(a),1,fp)==1)
+					{
+						if(a.id != ID)
+						{
+							fwrite(&a,sizeof(a),1,fc);
+						}
+					}
+
+					fclose(fp);
+					remove(permanent);
+					fclose(fc);
+					printf("\n\nDeleting");
+				  	
+					for( i = 0; i < 30; i++ )
+				  	{
+				  		Sleep(10);
+				  		printf(".");
+					}
+					fflush(stdin);
+					rename(temporary,permanent);
+					
+					printf("\n\n\t\t\aRECORD IS SUCCESSFULLY DELETED!");
+del_tryagain:	
+					printf("\n\n\t\tDo you want to delete more (Y/N)?");
+					switch(getch())
+					{
+						case 'y':
+						{
+							deletebooks();
+							break;
+						}
+						
+						case 'n':
+						{
+							system("cls");
+							Headmessage();
+							mainmenu();
+							
+							break;
+						}
+						
+						default:
+						{
+						   printf("\n\t\t\a INVALID INPUT (press any key to try again)");
+						   getch();
+						   goto del_tryagain;
+						   break;
+						   	
+						}	
+					}
+					break;
+					
+					
+		    	}
+		    	
+		    	case 'n':
+		    		{
+		    			system("cls");
+		    			Headmessage();
+		    			mainmenu();
+		    			break;
+					}
+					
+				default:
+					{
+						 printf("\n\t\t\a INVALID INPUT (press any key to try again)");
+						   getch();
+						   goto Labelforinvaliddelete;
+						   break;
+					}
+					
+		    }
+	    }
+    
+	
+	
+}
+
+	
+//returnfunction
+void Returnfunc(void)
+{
+
+printf("\n\n\t\t Press ENTER to return to main menu");
+
+x:
+if(getch()==13) //allow only use of enter
+{
+ system("cls");
+ Headmessage();
+ mainmenu();
+}
+else
+goto x;
+}	
+
+
+//ResetCredentials
+void resetcredentials()
+{
+	int i;
+	char usernametemp[100],passtemp[100];
+	char temp[100];
+	strcpy(passtemp,Password);
+	system("cls");
+	Headmessage();
+	printf("\t\t\t<--------------------->Reset Credentials<----------------------->\n");
+    for(i=0;i<120;i++)
+    {
+
+    	printf("-");
+	}
+	fp = fopen("Usercredentials.txt","r");
+	fc = fopen("copycreden.txt","w");
+	printf("\n\n\t\t--> Current username: %s",Username);
+	printf("\n\t\t--> Current password: %s",Password);
+	while(fread(&user,sizeof(user),1,fp)==1)
+	{
+		if(strcmp(user.username,Username)!=0)
+		{
+			fwrite(&user,sizeof(user),1,fc);
+		}
+	}
+invalid_reset:	
+	printf("\n\n\tDo you want to reset current credentials (Y/N)?");
+	switch(getch())
+	{
+		case 'y':
+			{
+				
+				system("cls");
+				Headmessage();
+				printf("\t\t\t<--------------------->Reset Credentials<----------------------->\n");
+			    for(i=0;i<120;i++)
+			    {
+			
+			    	printf("-");
+				}
+				printf("\n\n\t\t1) Enter new username: ");
+				fflush(stdin);
+				gets(usernametemp);
+				fflush(stdin);
+				rewind(fp);
+				while(fread(&user,sizeof(user),1,fp)==1)
+				{
+					if(strcmp(usernametemp,user.username)==0)
+					{
+			            if(strcmp(Username,usernametemp)==0)
+			            {
+			            	continue;
+						}
+						else
+						{
+							printf("\n\n\t\t\aERROR! Username already taken... press anykey to try again!");
+							getch();
+							resetcredentials();
+						}
+					}
+				
+				}
+				strcpy(user.username,usernametemp);
+				printf("\n\n\t\t2) Enter new password: ");
+				fflush(stdin);
+				gets(user.password);
+				fflush(stdin);
+				fwrite(&user,sizeof(user),1,fc);
+				fclose(fp);
+				fclose(fc);
+				printf("\n\nUpdating");
+	          	for(i=0;i<30;i++)
+	          	{
+	          		Sleep(28);
+	          		printf(".");	          		
+				}
+				printf("\n\n\t\tCredentials have been succefully reset");
+				fp = fopen("Usercredentials.txt","w");
+				fc = fopen("copycreden.txt","r");
+				
+				while(fread(&user,sizeof(user),1,fc) == 1)
+				{
+					fwrite(&user,sizeof(user),1,fp);
+				}
+				fclose(fp);
+				fclose(fc);
+				char temp[100]={"copycreden.txt"};
+				remove(temp);
+				Returnfunc();
+				break;		
+			}
+			
+			case 'n':
+				{
+					fclose(fu);
+					fclose(fc);
+					remove("copycreden.txt");
+					Returnfunc();
+					break;
+				}
+				
+			default:
+			{
+				printf("\n\n\t\t\aINVALID INPUT");
+				printf("\n\n\t\tPress any key to continue: ");
+				getch();
+				goto invalid_reset;
+				break;
+			}	
+	}
+            
+	
+}
+
+	
+
+
+//credentials
+void Credentials()
+{
+	int i;
+signup_page:	
+    system("cls");
+    Headmessage();
+	printf("\n\n\n\t\t\t\ta) LOGIN");
+	printf("\n\n\n\t\t\t\tb) SIGN UP");
+	printf("\n\n\n\t\t\t\tc) Close Application");
+credentials:	
+	printf("\n\n\t\t\tEnter your choice: ");
+	
+	
+	switch(getch())
+	{
+		case 'a':
+		{
+login:			
+            system("cls");
+            Headmessage();
+		    printf("\t\t\t<--------------------->LOG IN<----------------------->\n");
+		    for(i=0;i<120;i++)
+		    {
+		
+		    	printf("-");
+			}
+//		   char Username[100],Password[100];
+		   printf("\n\n\n\t\t\t 1) Username: ");
+		   fflush(stdin);
+		   gets(Username);
+		   fflush(stdin);
+		   printf("\n\t\t\t 2) Password: ");
+		   gets(Password);
+		   int x=0;
+		   
+		   fu = fopen("Usercredentials.txt","r");
+		   rewind(fu);
+		   	while(fread(&user,sizeof(user),1,fu)==1)
+		   	{
+		   		if(strcmp(Username,user.username)==0  &&  strcmp(Password,user.password)==0)
+		   		{
+		   			printf("\n\n\t\tSuccessfully Logged in");
+		   			x = -999;
+		   			Sleep(40);
+		   			printf("\n\nLoading");
+		          	for(i=0;i<30;i++)
+		          	{
+		          		Sleep(28);
+		          		printf(".");
+		          		
+					}
+					Sleep(28);
+					system("cls");
+		          	Headmessage();
+		          		
+		          	mainmenu();
+		   			
+				}
+		    }
+				if(x!=-999)
+				{
+					x=0;
+					printf("\n\n\t\t\a Invalid username or password");
+					
+					printf("\n\nPress 'a' to go back or 'b' to retry:  ");
+					switch(getch())
+					{
+						case 'a':
+							{
+								system("cls");
+								goto signup_page;
+								break;
+								
+							}
+							
+							
+						case 'b':
+						{
+						   goto login;
+						   break;	
+						}	
+						
+						default:
+							{
+								printf("\n\n\t\tINVALID INPUT.... Press ENTER to continue");
+								if(getch()==13)
+								{
+									goto login;
+									break;
+								}
+							}
+					}
+				}
+				
+			
+		   
+           
+			break;
+		}
+		
+		case 'b':
+		{
+			system("cls");
+			Headmessage();
+			printf("\t\t\t<--------------------->SIGN UP<----------------------->\n");
+		    for(i=0;i<120;i++)
+		    {
+		    
+		    	printf("-");
+			}
+			
+			fu = fopen("Usercredentials.txt","a+");
+            if(getcredentials()==1)
+            {
+		    	fseek(fu,0,SEEK_END);
+		        fwrite(&user,sizeof(user),1,fu);
+		        fclose(fu);
+		        printf("\n\n\t\t\t\a<-----Account is successfully created----->");
+		        printf("\n\n\t\tPress ENTER to Log in : ");
+		        if(getch()==13)
+		        {
+		        	goto login;
+				}
+		    }
+			break;
+		}
+		
+		case 'c':
+			{
+			   system("cls");
+			   Headmessage();
+			   printf("\n");
+			   printf("\t\t-------------------------------------------------------------------------\n");
+			   printf("\t\t|\t\t\tThis project was programmed by :                |");
+			   printf("\n\t\t|                                                                       |\n");
+			   Sleep(40);
+			   printf("\t\t|\t\t\t1) Insia Farhan (20k-0265)                      |");
+			   printf("\n\t\t|                                                                       |\n");
+			   Sleep(40);
+			   printf("\t\t|\t\t\t2) Syed Azam (20k-0255)                         |");
+			   printf("\n\t\t|                                                                       |\n");
+			   Sleep(40);
+			   printf("\t\t|\t\t\t3) Muhammad Shayan (20k-0186)                   |\n");
+			   printf("\t\t-------------------------------------------------------------------------\n");
+			   printf("\n\nExiting in 2 seconds-------------->");
+			   Sleep(2000);
+			   exit(0);  
+			}
+		
+		default:
+			{
+				printf("\n\n\t\t\aINVALID INPUT");
+				printf("\n\n\t\tPress any key to continue: ");
+				getch();
+				goto credentials;
+				break;
+			}
+	}
+}
+//get credentials
+int getcredentials()
+{
+	
+	char  temp[100];
+	printf("\n\n\t\t\tEnter the information below: ");
+tryagain:	
+	printf("\n\n\t\t 1) Username: ");
+	fflush(stdin);
+	gets(temp);
+	
+	if(checkcredentials(temp)==0)
+	{
+		printf("\n\n\n\n\n\t\aUsername already taken.. Press any key to try again");
+		getch();
+		goto tryagain;
+	}
+	
+	strcpy(user.username,temp);
+	fflush(stdin);
+	printf("\n\t\t 2) Password: ");
+	gets(user.password);
+	return 1;
+}
+
+
+int checkcredentials(char A[])
+{
+	rewind(fu);
+	while(fread(&user,sizeof(user),1,fu)==1)
+	{
+		if(strcmp(A,user.username)==0)
+		return 0; 
+	}	 //returns 0 if name exits
+		return 1; //return 1 if it not
+}
+
+//editbooks
+void editbooks()
+{
+	char x,flag,tempname[100],tempauthor[100];
+	int i;
+	int ID;
+	system("cls");
+	Headmessage();
+	printf("\t\t\t<--------------------->EDIT BOOKS<----------------------->\n");
+    for(i=0;i<120;i++)
+    {
+    
+    	printf("-");
+	}
+	printf("\n\n\t\tEnter the book-ID that you want to edit: ");
+	scanf("%d",&ID);
+	
+	fp = fopen("Addbooks.txt","r");
+	
+	rewind(fp);
+	while(fread(&a,sizeof(a),1,fp)==1)
+	{
+		if(a.id==ID)
+		{
+			x = 'x';
+		}
+	}
+	if(x!='x')
+	{
+		printf("\n\n\t\tError! No record found");
+		printf("\n\n\tPress ENTER to try again");
+		if(getch()==13)
+		{
+			editbooks();
+		}
+	}
+	rewind(fp);
+	fc = fopen("copyedit.txt","w");
+	while(fread(&a,sizeof(a),1,fp)==1)
+	{
+		if(a.id!=ID)
+		{
+			fwrite(&a,sizeof(a),1,fc);
+		}
+		else
+		{
+			 flag = 'x';
+			 strcpy(tempname,a.name);
+			 strcpy(tempauthor,a.Author);
+		}
+    }
+    fclose(fp);
+	
+    
+		if(flag=='x')
+		{
+			printf("\n\n\t\tTHE BOOK IS AVAILABLE");
+			printf("\n\n\t\tBook Name: %s",tempname);
+			printf("\n\n\t\tAuthor: %s",tempauthor);
+invalid_editbook:			
+			printf("\n\n\t\tDo you want to edit this book (Y/N)?");
+			switch(getch())
+			{
+				case 'y':
+					{
+						remove("Addbooks.txt");
+						a.id=ID;
+						printf("\n\n\n\t\t1) Enter new name: ");
+						fflush(stdin);
+						gets(a.name);
+						fflush(stdin);
+						printf("\n\t\t2) Enter new Author: ");
+						gets(a.Author);
+						fflush(stdin);
+						printf("\n\t\t3) Enter Quantity: ");
+						scanf("%d",&a.quantity);
+						printf("\n\t\t4)Enter Price: ");
+						scanf("%f",&a.Price);
+						printf("\n\t\t5) Enter Rack No : ");
+						scanf("%d",&a.rackno);
+						fflush(stdin);
+						fwrite(&a,sizeof(a),1,fc);
+						
+						fclose(fc);
+						
+						printf("\n\nUpdating");
+			          	for(i=0;i<30;i++)
+			          	{
+			          		Sleep(28);
+			          		printf(".");
+			          		
+						}
+						
+					
+						fflush(stdin);				
+						rename("copyedit.txt","Addbooks.txt");
+						printf("\n\n\t\tRecord has been successfully updated");
+						Returnfunc();
+						break;
+						
+						
+					}
+					
+					case 'n':
+						{
+						
+							fclose(fc);
+							remove("copyedit.txt");
+							Returnfunc();
+							break;
+						}
+						
+					default:
+					{
+						printf("\n\n\t\tINVALID INPUT");
+						printf("\n\n\tPress anykey to try again: ");
+						getch();
+						goto invalid_editbook;
+						break;
+						
+					}	
+			}
+		}
+	
+	
+}
+
+
+int checkid(int t)  //check whether the book already exists in library or not
+{
+	rewind(fp);
+	while(fread(&a,sizeof(a),1,fp)==1)
+	{
+		if(a.id==t)
+		return 0; 
+	}	 //returns 0 if book exits
+		return 1; //return 1 if it not
+
+
+
+}
+
+
+
+
