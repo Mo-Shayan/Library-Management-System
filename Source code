@@ -31,7 +31,7 @@ char Username[100],Password[100];
 struct books
 {
 	int id;
-	char stname[50];
+	//char stname[50];
 	char name[50];
 	char Author[50];
 	char prologue[1000];
@@ -223,7 +223,7 @@ void Addbooks()
     	printf("-");
 	}
 	
-	fp = fopen("Addbooks.txt","ab+");
+	fp = fopen("Addbooks.txt","a+");
     
 	if( GetInfo()==1 )
     {
@@ -283,6 +283,20 @@ int GetInfo()
    fflush(stdin);
    gets(a.prologue);
    return 1;
+
+
+}
+
+int checkid(int t)  //check whether the book already exists in library or not
+{
+	rewind(fp);
+	while(fread(&a,sizeof(a),1,fp)==1)
+	{
+		if(a.id==t)
+		return 0; 
+	}	 //returns 0 if book exits
+		return 1; //return 1 if it not
+
 
 
 }
@@ -529,8 +543,6 @@ void viewbooks()
 //deletebooks
 void deletebooks()
 {
-	char temporary[100]={"copydelete.txt"};
-	char permanent[100]={"Addbooks.txt"};
 	char Del;
 
 	system("cls");
@@ -549,8 +561,8 @@ void deletebooks()
 	printf("\n\n\t\tEnter the BOOK-ID that you want to delete:  ");
 	scanf("%d", &ID);
 	
-	fp = fopen(permanent,"r");
-
+	fp = fopen("Addbooks.txt","r");
+    fc = fopen("copydelete.txt","w");
 
 	rewind(fp);
 
@@ -581,7 +593,7 @@ Labelforinvaliddelete:
 			{
 				case 'y':
 				{
-					fc = fopen(temporary,"w");
+					
 					rewind(fp);
 					while(fread(&a,sizeof(a),1,fp)==1)
 					{
@@ -592,8 +604,18 @@ Labelforinvaliddelete:
 					}
 
 					fclose(fp);
-					remove(permanent);
 					fclose(fc);
+					
+					fp=fopen("Addbooks.txt","w");
+					fc=fopen("copydelete.txt","r");
+					while(fread(&a,sizeof(a),1,fc)==1)
+					{
+						fwrite(&a,sizeof(a),1,fp);
+					}
+                    fclose(fp);
+                    fclose(fc);
+                    remove("copydelete.txt");
+					
 					printf("\n\nDeleting");
 				  	
 					for( i = 0; i < 30; i++ )
@@ -601,8 +623,7 @@ Labelforinvaliddelete:
 				  		Sleep(10);
 				  		printf(".");
 					}
-					fflush(stdin);
-					rename(temporary,permanent);
+					
 					
 					printf("\n\n\t\t\aRECORD IS SUCCESSFULLY DELETED!");
 del_tryagain:	
@@ -640,6 +661,9 @@ del_tryagain:
 		    	
 		    	case 'n':
 		    		{
+		    			fclose(fp);
+		    			fclose(fc);
+		    			remove("copydelete.txt");
 		    			system("cls");
 		    			Headmessage();
 		    			mainmenu();
@@ -736,6 +760,9 @@ invalid_reset:
 						}
 						else
 						{
+							fclose(fp);
+							fclose(fc);
+							remove("copycreden.txt");
 							printf("\n\n\t\t\aERROR! Username already taken... press anykey to try again!");
 							getch();
 							resetcredentials();
@@ -1060,7 +1087,7 @@ invalid_editbook:
 			{
 				case 'y':
 					{
-						remove("Addbooks.txt");
+						//remove("Addbooks.txt");
 						a.id=ID;
 						printf("\n\n\n\t\t1) Enter new name: ");
 						fflush(stdin);
@@ -1088,9 +1115,19 @@ invalid_editbook:
 			          		
 						}
 						
+						fp=fopen("Addbooks.txt","w");
+						fc=fopen("copyedit.txt","r");
+						rewind(fc);
+						while(fread(&a,sizeof(a),1,fc)==1)
+						{
+							fwrite(&a,sizeof(a),1,fp);
+						}
+						fclose(fp);
+						fclose(fc);
 					
+					remove("copyedit.txt");
 						fflush(stdin);				
-						rename("copyedit.txt","Addbooks.txt");
+						//rename("copyedit.txt","Addbooks.txt");
 						printf("\n\n\t\tRecord has been successfully updated");
 						Returnfunc();
 						break;
@@ -1123,19 +1160,6 @@ invalid_editbook:
 }
 
 
-int checkid(int t)  //check whether the book already exists in library or not
-{
-	rewind(fp);
-	while(fread(&a,sizeof(a),1,fp)==1)
-	{
-		if(a.id==t)
-		return 0; 
-	}	 //returns 0 if book exits
-		return 1; //return 1 if it not
-
-
-
-}
 
 
 
