@@ -75,7 +75,7 @@ void Headmessage()
 	
 	for( i = 0; i < 120; i++ )
     {
-    	Sleep(1);
+    	Sleep(0.6);
     	printf("-");
 	}
 	printf("\n");
@@ -143,7 +143,7 @@ void mainmenu()
 	printf("\n\n\n\t\t\tq) Sign out\n\n");
 	for( i = 0; i < 120; i++ )
     {
-    	Sleep(5);
+    	Sleep(2);
     	printf("-");
 	}
 	printf("\nEnter your choice: ");
@@ -195,9 +195,9 @@ void mainmenu()
 		default:
 		{	
 		    printf("\n\n\t\t\t");
-			printf("\aWrong Entry!!Please re-enter correct option");
+			printf("\aWrong Entry!!Press ENTER to retry");
 
-			if( getch() );
+			if( getchar()==13 );
 			{
 				system("cls");
 
@@ -852,7 +852,6 @@ login:
 		
 		    	printf("-");
 			}
-//		   char Username[100],Password[100];
 		   printf("\n\n\n\t\t\t 1) Username: ");
 		   fflush(stdin);
 		   gets(Username);
@@ -910,12 +909,11 @@ login:
 						
 						default:
 							{
-								printf("\n\n\t\tINVALID INPUT.... Press ENTER to continue");
-								if(getch()==13)
-								{
-									goto login;
-									break;
-								}
+								printf("\n\n\t\tINVALID INPUT.... Press anykey to continue");
+								getch();								
+					    		goto login;
+								break;
+								
 							}
 					}
 				}
@@ -1087,7 +1085,6 @@ invalid_editbook:
 			{
 				case 'y':
 					{
-						//remove("Addbooks.txt");
 						a.id=ID;
 						printf("\n\n\n\t\t1) Enter new name: ");
 						fflush(stdin);
@@ -1102,6 +1099,9 @@ invalid_editbook:
 						scanf("%f",&a.Price);
 						printf("\n\t\t5) Enter Rack No : ");
 						scanf("%d",&a.rackno);
+						fflush(stdin);
+						printf("\n\t\t5) Enter Prologue : ");
+						gets(a.prologue);
 						fflush(stdin);
 						fwrite(&a,sizeof(a),1,fc);
 						
@@ -1127,7 +1127,6 @@ invalid_editbook:
 					
 					remove("copyedit.txt");
 						fflush(stdin);				
-						//rename("copyedit.txt","Addbooks.txt");
 						printf("\n\n\t\tRecord has been successfully updated");
 						Returnfunc();
 						break;
@@ -1158,8 +1157,6 @@ invalid_editbook:
 	
 	
 }
-
-
 
 
 
